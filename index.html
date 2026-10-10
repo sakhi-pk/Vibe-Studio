@@ -1,0 +1,678 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SAK Studio</title>
+<meta name="description" content="Beginner-first AI development studio: build a game, a website and a mobile app, one step at a time.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky nav, hero, studio cards, then one tutorial workspace (tabs, selectors, stepper),
+   then library, troubleshooting, videos, about. The whole page re-themes per studio via [data-studio] tokens. */
+:root{
+  --bg:#171717; --surface:#242424; --surface2:#2e2e2e; --line:#3a3a3a;
+  --fg:#f5f5f5; --muted:#b3ada3; --accent:#f59e0b; --accent-ink:#171717;
+  --code:#0c0c0c; --good:#4ade80; --warn:#fbbf24; --bad:#f87171;
+  --display:'Bricolage Grotesque',Georgia,serif; --body:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+[data-studio="web"]{
+  --bg:#ffffff; --surface:#f5f7fb; --surface2:#e8edf6; --line:#d5dcea;
+  --fg:#101828; --muted:#475467; --accent:#2563eb; --accent-ink:#ffffff;
+  --code:#101828; --good:#047857; --warn:#a15c00; --bad:#b42318; color-scheme:light;
+}
+[data-studio="app"]{
+  --bg:#102a24; --surface:#183b32; --surface2:#1f4a3f; --line:#2c5c4f;
+  --fg:#f0fdf4; --muted:#a8d4c1; --accent:#6ee7b7; --accent-ink:#102a24;
+  --code:#081a16; --good:#6ee7b7; --warn:#fcd34d; --bad:#fca5a5; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 40px;transition:background .25s,color .25s}
+a{color:var(--accent)}
+.w{max-width:1000px;margin-inline:auto}
+section.blk{padding-block:48px 8px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+h2{font-size:clamp(26px,4.5vw,34px);font-weight:800}
+h3{font-size:20px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{font-family:inherit}
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+header.top .w{display:flex;align-items:center;gap:20px;padding-block:10px}
+.brand{font:800 18px var(--display);text-decoration:none;color:var(--fg);white-space:nowrap}
+.brand b{color:var(--accent)}
+nav.main{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+nav.main a{color:var(--muted);text-decoration:none;font-weight:500;font-size:14px;padding:6px 10px;border-radius:6px;white-space:nowrap}
+nav.main a:hover{color:var(--fg);background:var(--surface)}
+/* hero */
+.hero{padding-block:56px 8px;display:grid;gap:20px}
+.hero h1{font-size:clamp(36px,7.5vw,64px);font-weight:800;line-height:1.02}
+.hero p.lead{font-size:18px;color:var(--muted);max-width:60ch}
+.flow{display:flex;flex-wrap:wrap;gap:6px;font:600 12px var(--mono)}
+.flow span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+.flow span:not(:last-child)::after{content:" →";color:var(--accent)}
+.btn{display:inline-block;font:700 15px var(--body);border-radius:10px;padding:12px 20px;cursor:pointer;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);text-decoration:none}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.sm{padding:8px 14px;font-size:13px;border-radius:8px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.note{font-size:14px;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+/* cards */
+.grid3{display:grid;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:10px;align-content:start;min-width:0}
+.sc{border-top:4px solid var(--c)}
+.sc .sw{display:flex;gap:4px}.sc .sw i{width:20px;height:8px;border-radius:2px;background:var(--c)}
+.chip{display:inline-block;font:600 12px var(--mono);border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+.chip.soon{border-style:dashed}
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tab{font:700 13px var(--mono);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 13px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+/* selectors */
+.sel{display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.sel .grp{display:grid;gap:6px}
+.sel label,.lbl{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content;max-width:100%}
+.seg button{background:transparent;border:0;color:var(--muted);font:600 13px var(--mono);padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+@media(min-width:720px){.sel{grid-template-columns:repeat(3,1fr)}}
+/* tutorial */
+.two{display:grid;gap:14px}
+@media(min-width:760px){.two{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}}
+ul.plain{margin:0;padding-left:20px;display:grid;gap:4px}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px}
+iframe.game{width:100%;max-width:380px;height:520px;border:1px solid var(--line);border-radius:10px;background:#171717;margin-inline:auto;display:block}
+.stepper{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px;min-width:0}
+.slider{display:grid;gap:6px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.dots{display:flex;gap:4px}.dots i{flex:1;height:5px;border-radius:3px;background:var(--line)}.dots i.d{background:var(--accent)}.dots i.cur{background:var(--fg)}
+.stepno{font:600 12px var(--mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.stepper h3{font-size:24px}
+.warn{border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:12px;display:grid;gap:8px;font-size:14px}
+.cmdbox{display:grid;gap:6px;min-width:0}
+.cmd{position:relative;background:var(--code);color:#e9e9e9;border-radius:10px;padding:14px 76px 14px 14px;font:400 13.5px/1.6 var(--mono);overflow-x:auto;white-space:pre;margin:0}
+.cmd.wrap{white-space:pre-wrap;word-break:break-word}
+.cpy{position:absolute;top:8px;right:8px;font:600 12px var(--mono);background:#ffffff26;color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
+.cpy:hover{background:#ffffff40}
+.expect{border-left:3px solid var(--good);padding:4px 0 4px 12px;color:var(--fg);font-size:15px}
+.expect b{color:var(--good)}
+details.fail,details.gl,details.q{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+details summary{cursor:pointer;padding:11px 14px;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details summary::after{content:"+";color:var(--accent);font:600 16px var(--mono)}
+details[open] summary::after{content:"–"}
+details .in{padding:0 14px 14px;display:grid;gap:10px;font-size:15px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.chk input{margin-top:5px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.done{display:flex;gap:10px;align-items:center;font-weight:700}
+.done input{accent-color:var(--accent);width:20px;height:20px}
+.outline{display:flex;flex-wrap:wrap;gap:6px}
+.outline button{font:600 12px var(--mono);background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:5px 9px;cursor:pointer}
+.outline button.d{border-color:var(--good);color:var(--good)}
+.outline button.cur{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.nav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.fields{display:grid;gap:8px}
+.fields input,.f input,.f select{font:inherit;width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.fields label{font-size:13px;color:var(--muted)}
+/* demos */
+.phone{width:min(100%,300px);margin-inline:auto;border:8px solid #0b0b0b;border-radius:28px;background:#f7faf8;color:#12201b;padding:14px;display:grid;gap:10px;min-height:340px;align-content:start}
+.phone h4{margin:0;font:800 18px var(--display)}
+.phone .cnt{display:flex;gap:8px;font:600 12px var(--mono);color:#40574d}
+.phone form{display:flex;gap:6px}.phone input[type=text]{flex:1;min-width:0;padding:9px;border-radius:8px;border:1px solid #b9cbc2;font:inherit;background:#fff;color:#12201b}
+.phone button.a{background:#0f6b4f;color:#fff;border:0;border-radius:8px;padding:0 12px;font-weight:700;cursor:pointer}
+.phone ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.phone li{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #d6e3dc;border-radius:8px;padding:8px}
+.phone li span{flex:1;min-width:0;overflow-wrap:anywhere}.phone li.dn span{text-decoration:line-through;color:#7a8f86}
+.phone li button{border:0;background:transparent;color:#a33;cursor:pointer;font-weight:700;padding:4px 8px}
+.phone .err{color:#a33;font-size:12px;min-height:16px}
+.site{background:#fff;color:#101828;border-radius:10px;border:1px solid var(--line);overflow:hidden}
+.site .bar{display:flex;gap:14px;padding:10px 14px;border-bottom:1px solid #e4e7ec;font-size:12px;font-weight:700}
+.site .h{padding:22px 16px;display:grid;gap:8px;background:#eef3ff}
+.site .h b{font:800 22px var(--display)}.site .h i{display:inline-block;width:max-content;background:#2563eb;color:#fff;font-style:normal;font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px}
+.site .s{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;font-size:11px}.site .s div{border:1px solid #e4e7ec;border-radius:6px;padding:8px}
+/* library */
+.filters{display:grid;gap:10px}
+@media(min-width:760px){.filters{grid-template-columns:2fr 1fr 1fr 1fr 1fr}}
+.lib{display:grid;gap:10px}
+.li{display:flex;gap:12px;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;flex-wrap:wrap}
+.li .t{min-width:0;display:grid;gap:4px}
+.vid{display:grid;gap:12px}
+.ph{aspect-ratio:16/9;max-width:520px;border:2px dashed var(--line);border-radius:12px;display:grid;place-items:center;color:var(--muted);font:600 14px var(--mono);text-align:center;padding:12px}
+.show{display:grid;gap:12px}
+@media(min-width:760px){.show{grid-template-columns:repeat(3,1fr)}}
+.empty{border:2px dashed var(--line);border-radius:12px;padding:24px;text-align:center;color:var(--muted);font-size:14px}
+.avatar{width:96px;height:96px;border-radius:50%;background:var(--surface2);border:2px dashed var(--line);display:grid;place-items:center;font:800 28px var(--display);color:var(--accent)}
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:24px;color:var(--muted);font-size:14px;display:grid;gap:12px}
+footer .links{display:flex;flex-wrap:wrap;gap:16px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:30}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="w">
+  <a class="brand" href="#top">SAK <b>Studio</b></a>
+  <nav class="main" aria-label="Sections">
+    <a href="#studios">Studios</a><a href="#start">First project</a><a href="#checklist">Checklist</a><a href="#tutorial">Tutorials</a><a href="#videos">Videos</a><a href="#library">Library</a><a href="#help">Help</a><a href="#showcase">Showcase</a><a href="#about">About</a>
+  </nav>
+</div></header>
+
+<main class="w" id="top">
+  <section class="hero">
+    <div class="eyebrow">AI-assisted development for beginners</div>
+    <h1>Your Idea. Your AI. Your First Digital Product.</h1>
+    <p class="lead">Learn how to build websites, mobile apps, and playable games with AI, one beginner-friendly step at a time.</p>
+    <div class="flow" aria-label="Learning path"><span>Idea</span><span>Prompt</span><span>Build</span><span>Test</span><span>Improve</span><span>Publish</span><span>Portfolio</span></div>
+    <div class="row"><a class="btn" href="#tutorial">Start Building</a><a class="btn ghost" href="#studios">Explore the Three Studios</a></div>
+    <p class="note">A simple prototype can come together quickly. Testing, publishing and advanced features take longer, and your time depends on your setup and the AI tool you use.</p>
+  </section>
+
+  <section class="blk" id="studios">
+    <h2>Three studios, one method</h2>
+    <p class="muted">Every studio follows the same path. Pick the one that matches what you want to make first.</p>
+    <div class="grid3" id="studiocards"></div>
+  </section>
+
+  <section class="blk" id="start">
+    <h2>Choose your first project</h2>
+    <p class="muted">Pick one. We will set up the matching studio and take you to the first lesson.</p>
+    <div class="grid3" id="projcards"></div>
+  </section>
+
+  <section class="blk" id="checklist">
+    <h2>Beginner setup checklist</h2>
+    <p class="muted">Tick each item only when you have actually done it. Ticks are saved in this browser only (local-only, not an account).</p>
+    <div class="card" id="setupcl"></div>
+  </section>
+
+  <section class="blk" id="tutorial">
+    <div class="eyebrow">Interactive tutorials</div>
+    <h2 id="tuttitle">Tutorial</h2>
+    <div class="tabs" role="tablist" aria-label="Studios" id="studiotabs"></div>
+    <div id="tutbody" role="tabpanel"></div>
+  </section>
+
+  <section class="blk" id="videos">
+    <h2>Video tutorials</h2>
+    <p class="muted">No video links have been verified yet, so none are embedded. Until real URLs are added, each tab points to the official documentation.</p>
+    <div class="tabs" role="tablist" aria-label="Video topics" id="vidtabs"></div>
+    <div id="vidbody" role="tabpanel"></div>
+  </section>
+
+  <section class="blk" id="library">
+    <h2>Tutorial library</h2>
+    <p class="muted">Three beginner lessons are ready now. The rest are planned and are labelled as such, so no link goes to a missing page. Durations are rough estimates.</p>
+    <div class="filters">
+      <div class="f"><label class="lbl" for="fq">Search</label><input id="fq" type="search" placeholder="e.g. forms, sound, deploy"></div>
+      <div class="f"><label class="lbl" for="fs">Studio</label><select id="fs"><option value="">All</option><option value="game">Game</option><option value="web">Web</option><option value="app">App</option></select></div>
+      <div class="f"><label class="lbl" for="fd">Difficulty</label><select id="fd"><option value="">All</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
+      <div class="f"><label class="lbl" for="ft">Duration (est.)</label><select id="ft"><option value="">Any</option><option value="30">Up to 30 min</option><option value="60">Up to 60 min</option><option value="999">Over 60 min</option></select></div>
+      <div class="f"><label class="lbl" for="fp">Project type</label><select id="fp"><option value="">All</option><option>Game</option><option>Website</option><option>Mobile app</option></select></div>
+    </div>
+    <div class="lib" id="liblist" aria-live="polite"></div>
+  </section>
+
+  <section class="blk" id="help">
+    <h2>Troubleshooting center</h2>
+    <p class="note">Never paste passwords, API keys, access tokens or other private credentials into an AI chat or a public forum.</p>
+    <div class="f"><label class="lbl" for="tq">Search problems</label><input id="tq" type="search" placeholder="e.g. port, blank page, QR code"></div>
+    <div class="lib" id="trlist" aria-live="polite"></div>
+    <h3>What does this mean?</h3>
+    <div class="lib" id="gloss"></div>
+  </section>
+
+  <section class="blk" id="showcase">
+    <h2>Project showcase</h2>
+    <p class="muted">Finished learner projects will be listed here. Nothing is shown until real projects and permission to share them exist.</p>
+    <div class="show"><div class="empty">Game showcase<br>No projects added yet</div><div class="empty">Website showcase<br>No projects added yet</div><div class="empty">App showcase<br>No projects added yet</div></div>
+  </section>
+
+  <section class="blk" id="about">
+    <h2>About SAK Hashmi</h2>
+    <div class="row" style="align-items:flex-start;gap:20px">
+      <div class="avatar" role="img" aria-label="Photo placeholder">SH</div>
+      <div style="flex:1;min-width:240px;display:grid;gap:12px">
+        <p>SAK Hashmi is an AI and digital skills educator focused on helping beginners turn ideas into practical digital projects. Through SAK Studio, learners can explore AI-assisted game development, web development, and mobile app development through guided projects, reusable prompts, and hands-on tutorials.</p>
+        <p>The learning philosophy is simple: Learn, Build, Execute, Teach, and Lead.</p>
+        <div class="row">
+          <a class="btn sm" href="https://www.linkedin.com/in/sakcoaching/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a class="btn sm ghost" href="https://www.facebook.com/SAKPPH/" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a class="btn sm ghost" href="https://sakhi-pk.github.io/portfolio/" target="_blank" rel="noopener noreferrer">Portfolio</a>
+        </div>
+        <div class="empty" style="text-align:left">Verified courses, projects and achievements will be added here by SAK Hashmi. Collaboration contact link: to be supplied.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="links"><a href="#tutorial">Tutorials</a><a href="#help">Troubleshooting</a><a href="https://vite.dev/guide/" target="_blank" rel="noopener noreferrer">Vite docs</a><a href="https://docs.expo.dev/get-started/create-a-project/" target="_blank" rel="noopener noreferrer">Expo docs</a><a href="https://www.linkedin.com/in/sakcoaching/" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://www.facebook.com/SAKPPH/" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://sakhi-pk.github.io/portfolio/" target="_blank" rel="noopener noreferrer">Portfolio</a></div>
+    <div>SAK Studio · Learn, Build, Execute, Teach, Lead. Free usage and features depend on the AI provider you choose.</div>
+  </footer>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+var toastT;function toast(m){var t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toastT);toastT=setTimeout(function(){t.className=''},2200)}
+var mem={};
+function store(k,v){
+  if(v!==undefined){mem[k]=v;try{localStorage.setItem('sak:'+k,JSON.stringify(v))}catch(e){}return v}
+  if(k in mem)return mem[k];
+  try{var r=localStorage.getItem('sak:'+k);if(r){mem[k]=JSON.parse(r);return mem[k]}}catch(e){}
+  return null}
+function copyFrom(btn){
+  var el=document.getElementById(btn.getAttribute('data-from')); var text=el.textContent;
+  function ok(){btn.textContent='Copied';toast('Copied to clipboard');setTimeout(function(){btn.textContent='Copy'},1500)}
+  function fb(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected';toast('Copy blocked here. Text is selected: press Ctrl+C or Cmd+C.');setTimeout(function(){btn.textContent='Copy'},2500)}
+  try{navigator.clipboard.writeText(text).then(ok,fb)}catch(e){fb()}
+}
+document.addEventListener('click',function(e){var b=e.target.closest('.cpy');if(b)copyFrom(b)});
+var uid=0;
+/* real copy button sits inside the pre via wrapper */
+function box(label,text,cls,rawId){var id=rawId||('cb'+(++uid));return '<div class="cmdbox">'+(label?'<div class="lbl">'+esc(label)+'</div>':'')+'<div style="position:relative"><pre class="cmd '+(cls||'')+'" id="'+id+'">'+esc(text)+'</pre><button class="cpy" data-from="'+id+'" aria-label="Copy: '+esc(label||'code')+'">Copy</button></div></div>'}
+function tabKeys(list,onPick){list.addEventListener('keydown',function(e){var t=$$('[role=tab]',list),i=t.indexOf(document.activeElement);if(i<0)return;var n=-1;if(e.key==='ArrowRight')n=(i+1)%t.length;if(e.key==='ArrowLeft')n=(i-1+t.length)%t.length;if(e.key==='Home')n=0;if(e.key==='End')n=t.length-1;if(n>=0){e.preventDefault();t[n].focus();onPick(t[n])}})}
+
+/* ---------- studio data ---------- */
+var STUDIOS={
+ game:{name:'SAK-Game-Dev Studio',c:'#f59e0b',tag:'Build playable games with AI.',proj:'Catch the Coins',projType:'Game',out:'a playable game link',folder:'sak-game',
+  lesson:'Build Your First 2D Game with AI',build:'A browser game where a player catches falling coins before time runs out, with score, restart and mobile controls.',
+  who:'Charcoal and amber',beginner:'Catch the Coins or Dodge the Obstacles',
+  need:['A computer with a modern browser','Free: HTML5 Canvas and plain JavaScript (no cost)','Local route: Node.js LTS, VS Code, a terminal','Optional: an AI coding tool (cost and free limits depend on the provider)'],
+  next:'Player Movement and Controls'},
+ web:{name:'SAK-Web-Dev Studio',c:'#2563eb',tag:'Build websites and web apps with AI.',proj:'Portfolio or business landing page',projType:'Website',out:'a live website link',folder:'sak-website',
+  lesson:'Build and Publish Your First Website with AI',build:'A responsive portfolio or landing page with navigation, hero, services, contact links and a published URL.',
+  who:'White and cobalt blue',beginner:'Personal portfolio or small-business landing page',
+  need:['A computer with a modern browser','Local route: Node.js LTS, VS Code, a terminal','A free GitHub account to publish with GitHub Pages','Optional: an AI coding tool or AI website builder (pricing varies by provider)'],
+  next:'AI Prompt Anatomy for Websites'},
+ app:{name:'SAK-App-Dev Studio',c:'#6ee7b7',tag:'Build mobile apps with AI.',proj:'Student task tracker',projType:'Mobile app',out:'an app running on your phone',folder:'sak-app',
+  lesson:'Build Your First Mobile App with AI',build:'A student task tracker you can open on your phone: add tasks, complete them, delete them, and see counts.',
+  who:'Deep green and mint',beginner:'Student task tracker or daily learning planner',
+  need:['Node.js LTS, VS Code or another editor, a terminal','Expo Go installed on a compatible phone','Computer and phone on the same network (or use the tunnel fallback)','Optional: an AI coding assistant'],
+  next:'Run It on Your Phone (deeper dive)'}
+};
+var ORDER=['game','web','app'];
+
+/* ---------- the browser game (single source for preview + copyable file) ---------- */
+var GAME_HTML=[
+'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Catch the Coins</title>',
+'<style>html,body{margin:0;height:100%;background:#171717;color:#f5f5f5;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center}',
+'#wrap{position:relative;width:min(100vw,360px)}canvas{width:100%;background:#242424;border-radius:10px;touch-action:none;display:block}',
+'#ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.65);border-radius:10px;text-align:center;padding:16px}',
+'button{font:700 16px system-ui;padding:10px 22px;border:0;border-radius:8px;background:#f59e0b;color:#171717;cursor:pointer}</style></head>',
+'<body><div id="wrap"><canvas id="c" width="360" height="480"></canvas>',
+'<div id="ov"><h2 id="t">Catch the Coins</h2><p id="m">Move with arrow keys, A and D, or drag. Catch coins for 30 seconds.</p><button id="b">Start</button></div></div>',
+'<script>',
+'var c=document.getElementById("c"),g=c.getContext("2d"),W=360,H=480;',
+'var ov=document.getElementById("ov"),t=document.getElementById("t"),m=document.getElementById("m"),b=document.getElementById("b");',
+'var state="ready",px=W/2,pw=64,coins=[],score=0,left=30,last=0,keys={},spawn=0,speed=2;',
+'function start(){px=W/2;coins=[];score=0;left=30;spawn=0;state="play";ov.style.display="none";last=performance.now();requestAnimationFrame(loop)}',
+'function end(){state="over";t.textContent="Time up!";m.textContent="Your score: "+score;b.textContent="Play again";ov.style.display="flex"}',
+'function loop(n){if(state!=="play")return;var dt=Math.min((n-last)/1000,0.05);last=n;left-=dt;',
+' if(left<=0){left=0;draw();end();return}',
+' speed=2+(30-left)*0.08;',
+' if(keys.arrowleft||keys.a)px-=260*dt;if(keys.arrowright||keys.d)px+=260*dt;px=Math.max(pw/2,Math.min(W-pw/2,px));',
+' spawn-=dt;if(spawn<=0){coins.push({x:20+Math.random()*(W-40),y:-10});spawn=Math.max(0.3,0.8-(30-left)*0.015)}',
+' for(var i=coins.length-1;i>=0;i--){var k=coins[i];k.y+=speed*60*dt;',
+'  if(k.y>H-38&&k.y<H-16&&Math.abs(k.x-px)<pw/2+8){score++;coins.splice(i,1)}else if(k.y>H+10){coins.splice(i,1)}}',
+' draw();requestAnimationFrame(loop)}',
+'function draw(){g.clearRect(0,0,W,H);g.fillStyle="#f59e0b";coins.forEach(function(k){g.beginPath();g.arc(k.x,k.y,8,0,7);g.fill()});',
+' g.fillStyle="#f5f5f5";g.fillRect(px-pw/2,H-30,pw,14);g.font="bold 16px system-ui";g.fillText("Score: "+score,12,24);g.fillText("Time: "+Math.ceil(left),W-86,24)}',
+'addEventListener("keydown",function(e){var k=e.key.toLowerCase();keys[k]=true;if(k.indexOf("arrow")===0)e.preventDefault()});',
+'addEventListener("keyup",function(e){keys[e.key.toLowerCase()]=false});',
+'c.addEventListener("pointermove",function(e){if(state!=="play")return;var r=c.getBoundingClientRect();px=Math.max(pw/2,Math.min(W-pw/2,(e.clientX-r.left)*W/r.width))});',
+'b.addEventListener("click",start);draw();',
+'<\/script></body></html>'
+].join('\n');
+
+/* ---------- prompts ---------- */
+var P_GAME='Act as an expert beginner-friendly HTML5 game developer. Build a complete, playable 2D browser game called Catch the Coins.\n\nRequirements:\n- Use the existing project structure and JavaScript framework.\n- Create a player, falling coins, a score counter, and a timer.\n- Add keyboard controls and appropriate touch controls for mobile.\n- Add a start screen, game-over screen, and restart button.\n- Include collision detection, scoring, and progressively increasing difficulty.\n- Make the game responsive and visually polished.\n- Keep the code readable and explain important files.\n- Do not use paid APIs or require an account.\n- Do not add unnecessary dependencies.\n- Handle missing assets gracefully.\n- Test the game logic and fix errors before declaring it complete.\n\nFirst inspect the existing files. Then implement the game in small, understandable steps. Tell me which files you changed, how to run the game, how to test it, and how to build it for production. Never claim to have run tests that you have not actually run.';
+var P_WEB='Act as a senior web designer and React developer who teaches absolute beginners.\n\nBuild a complete, polished, responsive website for my chosen project.\n\nProject details:\n- Project name: [ENTER NAME]\n- Target audience: [ENTER AUDIENCE]\n- Main purpose: [ENTER PURPOSE]\n- Main action visitors should take: [ENTER ACTION]\n- Preferred colors: [ENTER COLORS]\n- Content and services: [ENTER DETAILS]\n\nRequirements:\n1. Create a clear navigation bar and compelling hero section.\n2. Include relevant features, services, projects, or product sections.\n3. Add a clear call to action.\n4. Create a working contact method appropriate to the available infrastructure.\n5. Make the design responsive for phones, tablets, and desktops.\n6. Use semantic HTML, accessible controls, readable typography, and suitable contrast.\n7. Include meaningful loading, empty, success, and error states where relevant.\n8. Use realistic content supplied by me. Do not invent testimonials, qualifications, customers, or statistics.\n9. Avoid unnecessary dependencies and paid services.\n10. Keep components organized and explain the important files.\n11. Inspect the existing project before modifying it.\n12. Run available checks, fix errors, and report what was actually verified.\n13. Provide instructions for building and deploying the finished website.\n\nDo not create nonfunctional buttons or pretend that a form sends messages when no backend or form service is configured.';
+var P_APP='Act as an experienced React Native and Expo developer who teaches complete beginners.\n\nBuild a beginner-friendly student task tracker inside my existing Expo project.\n\nRequirements:\n- Create a clean home screen.\n- Let users add tasks with a title.\n- Let users mark tasks as completed.\n- Let users delete tasks.\n- Display total, pending, and completed task counts.\n- Add empty states and basic input validation.\n- Make the interface usable on small Android and iOS screens.\n- Use appropriate React Native components and the routing structure already present.\n- Keep code organized and explain which files to edit.\n- Use local state for the initial version.\n- If persistence is added, explain its limitations and test data retention.\n- Do not require paid APIs, expose secrets, or request unnecessary permissions.\n- Inspect the existing project before making changes.\n- Provide clear steps to run the app using Expo.\n- Test the implemented features where possible and report only checks that were actually performed.\n- Explain how to prepare a production build in a later lesson.';
+var IT_GAME=[
+ ['Improve the game design','Review my Catch the Coins game and suggest three design improvements (visuals, feedback, fairness). Implement the best one in small steps, tell me which files changed, and do not break existing controls.'],
+ ['Add sound and a mute switch','Add short sound effects for catching a coin and game over using the Web Audio API (no audio files). Add a visible mute button that remembers its state while the page is open. Explain each change and which files changed.'],
+ ['Add levels and difficulty','Add three levels. Each level should speed up coin falling and spawn rate. Show the level on screen and add an easy, normal and hard choice on the start screen. Keep the code readable.'],
+ ['Improve mobile controls','Improve touch controls for phones: a larger drag area, no page scrolling while playing, and left and right on-screen buttons as a fallback. Test at 360px wide and report only what you actually tested.'],
+ ['Fix a specific bug','My game has this bug: [DESCRIBE WHAT HAPPENS AND WHEN]. First inspect the code and explain the likely cause in simple words. Then fix it with the smallest change and tell me how to confirm it is fixed.'],
+ ['Review performance and accessibility','Review my game for performance (frame rate, memory) and accessibility (keyboard use, contrast, reduced motion, screen-reader labels for buttons). List problems by priority, fix the top three, and explain each fix simply.']];
+var IT_WEB=[
+ ['Improve the visual design','Review my website design. Improve spacing, typography hierarchy and color contrast without changing the content. Keep it responsive. Explain each change in simple words.'],
+ ['Add a mobile navigation menu','Add a mobile menu button that opens and closes the navigation on small screens. It must work with keyboard, have a clear label for screen readers, and close after a link is chosen.'],
+ ['Create a project gallery','Add a project gallery section using the projects I provide: [LIST PROJECTS]. Use a responsive grid, alt text on every image, and graceful handling of missing images. Do not invent projects.'],
+ ['Add a functional contact form','Add a contact form that really works using a free form service I will choose. Explain the options, add validation and success and error messages, and never put secrets in the code. If no service is configured, show a mailto link instead and say so.'],
+ ['Improve search-engine metadata','Add a page title, meta description, Open Graph tags, a favicon and a sensible heading structure. Explain what each does.'],
+ ['Check accessibility','Audit my site for accessibility: keyboard navigation, focus styles, color contrast, heading order, form labels and alt text. Fix the problems you find and list what you changed.'],
+ ['Fix broken links and layouts','Check every link and button on my site, and test the layout at 360px, 768px and 1280px wide. List anything broken and fix it. Report only checks you actually performed.'],
+ ['Improve page loading speed','Review my site for loading speed. Check image sizes, unused code and fonts. Make safe improvements, and explain each one and the trade-offs.']];
+var IT_APP=[
+ ['Improve app navigation','Add a simple tab navigation with a Tasks screen and an About screen using the routing already in my Expo project. Explain which files you created and why.'],
+ ['Save tasks locally','Save tasks on the device using a suitable local storage library for Expo, so they remain after the app restarts. Explain the limitations (for example, data is lost if the app is uninstalled) and how I can test that it persists.'],
+ ['Add a settings screen','Add a Settings screen with a toggle for showing completed tasks. Keep state organized and explain the files changed.'],
+ ['Add light and dark themes','Add light and dark themes that follow the phone setting, with a manual override on the Settings screen. Keep text readable in both themes.'],
+ ['Improve accessibility','Review my app for accessibility: touch target sizes, accessibility labels, contrast and screen-reader order. Fix the top issues and explain each fix.'],
+ ['Debug an error','My Expo app shows this error: [PASTE ERROR TEXT HERE, WITHOUT ANY SECRETS]. Explain what it means in simple words, find the likely cause in my code, fix it with the smallest change, and tell me how to confirm it works.'],
+ ['Prepare an app icon and splash screen','Explain how to set an app icon and splash screen in my Expo project configuration, which image sizes I need, and update the config to use placeholder files I will replace. Do not invent a brand.']];
+
+var WORKFLOW_YML='name: Deploy static content to Pages\n\non:\n  push:\n    branches: [\'main\']\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  pages: write\n  id-token: write\n\nconcurrency:\n  group: \'pages\'\n  cancel-in-progress: true\n\njobs:\n  deploy:\n    environment:\n      name: github-pages\n      url: ${{ steps.deployment.outputs.page_url }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: lts/*\n          cache: \'npm\'\n      - run: npm ci\n      - run: npm run build\n      - uses: actions/configure-pages@v5\n      - uses: actions/upload-pages-artifact@v3\n        with:\n          path: \'./dist\'\n      - id: deployment\n        uses: actions/deploy-pages@v4';
+function viteBase(repo){return 'import { defineConfig } from \'vite\'\n\nexport default defineConfig({\n  base: \'/'+repo+'/\',\n})'}
+
+/* ---------- step builders ---------- */
+function C(label,mac,win){return {k:'cmd',label:label,mac:mac,win:win===undefined?mac:win}}
+function PR(label,text,id){return {k:'prompt',label:label,text:text,id:id}}
+function CODE(label,text){return {k:'cmd',label:label,mac:text,win:text,wrap:true}}
+function IT(list){return list.map(function(p){return {k:'prompt',label:p[0],text:p[1]}})}
+
+var GL={
+ ai:'AI coding assistant: a tool where you describe what you want in words and it writes or edits the files for you.',
+ term:'Terminal: a text window where you type commands. On Windows use PowerShell. On a Mac use the Terminal app.',
+ folder:'Project folder: the folder on your computer that holds all files of one project.',
+ pkg:'Package manager: a tool (npm) that downloads code other people shared so you do not write everything yourself.',
+ fw:'Framework: a ready-made toolkit (like React) that gives your project a structure.',
+ dev:'Development server: a small program on your computer that shows your project in the browser while you work.',
+ prev:'Local preview: viewing your project only on your own computer, before it is published.',
+ api:'API: a way for one program to ask another program for data or a service.',
+ db:'Database: organized storage for data that must stay saved, such as user accounts.',
+ host:'Hosting: a service that keeps your finished site online so anyone can open it.',
+ dep:'Deployment: the act of sending your built project to a host so it goes live.',
+ dbg:'Debugging: finding and fixing the cause of a problem in your project.'
+};
+var GLOSS=[['AI coding assistant',GL.ai],['Terminal',GL.term],['Project folder',GL.folder],['Package manager',GL.pkg],['Framework',GL.fw],['Development server',GL.dev],['Local preview',GL.prev],['API',GL.api],['Database',GL.db],['Hosting',GL.host],['Deployment',GL.dep],['Debugging',GL.dbg]];
+
+var NODE_STEP={id:'node',t:'Install Node.js (LTS)',m:['local'],man:true,
+ what:'Node.js runs the tools behind modern web, game and app projects. Choose the LTS (long-term support) version. Vite needs Node 20.19 or later, or 22.12 or later. Download it from nodejs.org, or use the command below.',
+ blocks:[C('Install Node.js (needs Homebrew on macOS / winget on Windows)','brew install node','winget install OpenJS.NodeJS.LTS'),C('Check it worked','node --version\nnpm --version')],
+ link:['https://nodejs.org/','Download Node.js from nodejs.org'],
+ expect:'Two version numbers appear, for example v22.x.x and 10.x.x. Close and reopen the terminal if the command is not found.',
+ fail:[['"node" or "npm" is not recognized','Close the terminal and open a new one. If it still fails, reinstall Node.js and restart the computer. See Troubleshooting.']]};
+var VSC_STEP={id:'vsc',t:'Install VS Code and open a terminal',m:['local'],man:false,
+ what:'VS Code is a free code editor where you can see your project files. A terminal is the text window where you type commands. Install VS Code from code.visualstudio.com, then open a terminal: on Windows search for PowerShell in the Start menu, on a Mac search for Terminal using Spotlight (Cmd+Space).',
+ blocks:[],link:['https://code.visualstudio.com/','Download VS Code'],
+ expect:'You have an open terminal window with a blinking cursor.',fail:[['I cannot find the terminal','In VS Code open the menu Terminal, then New Terminal. It uses the same commands.']]};
+function aiPick(s){return {id:'pick',t:'Choose an AI coding workspace',m:['ai'],man:true,
+ what:'An AI coding workspace is an app where you describe your project and the AI creates files and shows a preview. Examples include Claude, Cursor and ChatGPT. Features, limits and free usage depend on the provider and your plan, so check their pricing page before you start. Never share passwords or API keys with the AI.',
+ blocks:[],expect:'You have an AI tool open that can create files and preview '+(s==='app'?'code':'your project')+'.',fail:[['The tool cannot preview my project','Use the local route instead. It needs Node.js but works with any AI tool.']]}}
+function browserStep(s){
+ if(s==='game')return {id:'bsave',t:'Save the game file and open it',m:['browser'],man:true,
+  what:'No install needed. Copy the full game below, paste it into a plain text editor, and save it as game.html (on Windows choose "All files" so it does not become game.html.txt). Then double-click the file to open it in your browser.',
+  blocks:[CODE('Complete game file: game.html',GAME_HTML)],expect:'A "Catch the Coins" start screen opens in your browser. Press Start and play.',
+  fail:[['Nothing happens or I see code on screen','The file was saved as .txt. Rename it to end with .html.']]};
+ if(s==='web')return {id:'bsave',t:'Ask AI for a single-file website, then open it',m:['browser'],man:true,
+  what:'No install needed. Ask the AI for one complete index.html file. Save its code as index.html in a new folder, then double-click it to open it in your browser. This route is great for learning, but a framework project is better for bigger sites.',
+  blocks:[PR('Prompt: single-file website','Act as a senior web designer who teaches absolute beginners. Build ONE complete index.html file (HTML, CSS and a little JavaScript, no frameworks, no paid services) for my project: [DESCRIBE YOUR PROJECT]. Make it responsive for phones and desktops, accessible, and use only real content I give you. Do not invent testimonials or statistics. Explain how to save and open it.')],
+  expect:'Your site opens in the browser from the saved file.',fail:[['The page looks unstyled','Make sure the CSS is inside the same file between style tags, or ask the AI to put everything in one file.']]};
+ return {id:'bsave',t:'Try your app in the browser with Expo Snack',m:['browser'],man:true,
+  what:'Expo Snack is Expo\'s browser editor for React Native, so you can write code without installing anything. It is good for practice. For the full workflow in this lesson (project files, Expo Go on your own phone, release builds) use the local route.',
+  blocks:[],link:['https://snack.expo.dev','Open Expo Snack'],expect:'The Snack editor opens in your browser with example code.',fail:[['Snack is slow or fails to load','Try another browser or use the local route.']]}}
+function promptStep(s,id){
+ var map={game:P_GAME,web:P_WEB,app:P_APP};
+ var st={id:id||'prompt',t:s==='game'?'Give the AI your game brief':s==='web'?'Give the AI your website brief':'Give the AI your app brief',m:['local','ai'],man:true,
+ what:s==='web'?'Fill the fields below. The prompt updates as you type. Then copy it into your AI tool, inside your project folder if you use a local route. Check what the AI changes before you accept it.':'Paste this prompt into your AI tool (inside your project folder if you use the local route). The AI should look at the files first, build in small steps, and tell you what it actually tested.',
+ blocks:[PR('Copy this prompt',map[s],'mainprompt')],
+ expect:s==='game'?'The AI creates the game and tells you which files changed and how to run it.':s==='web'?'The AI builds your site and lists the files it changed.':'The AI builds the task tracker and lists the files it changed.',
+ fail:[['The AI changed files I did not expect','Ask it to explain each changed file. If it is wrong, say "undo that change" and ask again with a narrower request.'],['The AI says it tested things','Check for yourself with the test step. Do not trust "tested" until you see it work.']]};
+ if(s==='web')st.fields=true;return st}
+
+var LESSONS={};
+LESSONS.game=[
+ aiPick('game'),browserStep('game'),NODE_STEP,VSC_STEP,
+ {id:'create',t:'Create the Vite project',m:['local'],man:true,
+  what:'Vite creates a starter project. npm create downloads the starter, cd moves your terminal into the new project folder, npm install downloads the packages, and npm run dev starts the development server. When asked, choose Vanilla and then JavaScript. Prompts can vary by version.',
+  blocks:[C('Create the project','npm create vite@latest sak-game'),C('Go into the folder','cd sak-game'),C('Install packages','npm install'),C('Start the development server','npm run dev')],
+  link:['https://vite.dev/guide/','Official Vite guide'],
+  expect:'The terminal prints a local address such as http://localhost:5173. Open it in your browser to see the Vite starter page.',
+  fail:[['Port already in use','Stop the other server with Ctrl+C, or run: npm run dev -- --port 5174'],['npm install fails','Check your internet, then see Troubleshooting for install errors.']]},
+ promptStep('game'),
+ {id:'run',t:'Run and play your game',m:['local','ai'],man:true,
+  what:'If the dev server stopped, start it again from inside the project folder. Open the address it shows. In an AI workspace, use its preview panel instead.',
+  blocks:[C('Start again if needed','npm run dev')],expect:'You see a start screen, press Start, and can move the player to catch coins.',
+  fail:[['Blank screen','Open the browser console (F12), copy the first red error, and use the debugging prompt in Troubleshooting.']]},
+ {id:'test',t:'Play-test your game',m:['local','ai','browser'],man:true,kind:'test',
+  what:'Test it like a player. Tick each item only when you have seen it work.',
+  checks:['The game starts from the start screen','Player moves with keyboard','Player moves with touch or drag on a phone-sized screen','Coins are collected when they touch the player','Score updates correctly','Timer counts down and the game ends at zero','Game-over screen appears','Restart button starts a fresh game','No red errors in the browser console (F12)','Layout works on a small screen'],
+  blocks:[],expect:'Every box is ticked. If one fails, use the "Fix a specific bug" prompt in the next step.',fail:[]},
+ {id:'improve',t:'Improve it with the AI',m:['local','ai','browser'],man:false,kind:'iterate',
+  what:'Make one improvement at a time, then test again. Each prompt below does one job.',blocks:IT(IT_GAME),expect:'Each change is small and you can test it before asking for the next.',fail:[]},
+ {id:'build',t:'Build for production',m:['local'],man:true,
+  what:'A production build is a small, fast version of your project made for publishing. It is saved in a folder called dist. npm run preview lets you try that built version on your computer.',
+  blocks:[C('Create the production build','npm run build'),C('Try the built version','npm run preview')],
+  expect:'A dist folder appears and the preview address shows your working game.',fail:[['The build fails','Copy the first error and use the debugging prompt. Fix errors before you publish.']]},
+ {id:'publish',t:'Publish to GitHub Pages',m:['local','ai','browser'],man:true,kind:'publish',
+  what:'GitHub Pages hosts static sites for free. For a repository site the address is https://USERNAME.github.io/REPOSITORY/, so Vite needs to know the repository name. 1) Create a GitHub repository named sak-game and push your project to it. 2) Set base in vite.config.js. 3) In the repository open Settings, then Pages, and set Source to GitHub Actions. 4) Add the workflow file. 5) Push to main and wait for the Actions run to finish. In an AI workspace you can use its own publish button instead. Browser-only route: upload game.html to any static host.',
+  blocks:[CODE('vite.config.js',viteBase('sak-game')),CODE('.github/workflows/deploy.yml (condensed from the official Vite guide)',WORKFLOW_YML)],
+  link:['https://vite.dev/guide/static-deploy.html','Official Vite static deployment guide'],
+  expect:'Your game opens at your GitHub Pages address and plays the same as locally. Share that URL.',
+  fail:[['Blank page after deploying','The base path in vite.config.js does not match your repository name. Fix it, push again and wait for the new run.'],['Workflow does not run','Check that Pages source is GitHub Actions and that you pushed to the main branch.']]}
+];
+LESSONS.web=[
+ aiPick('web'),browserStep('web'),NODE_STEP,VSC_STEP,
+ {id:'project',t:'Pick your project',m:['local','ai','browser'],man:true,
+  what:'Choose one project and write down its details. You will paste them into the prompt next. Options: personal portfolio, freelancer landing page, small-business website, course or coaching website, product landing page, or a simple interactive web app. Use real content only: your real services, your real contact links.',
+  blocks:[],expect:'You know the name, audience, purpose and main action for your site.',fail:[]},
+ {id:'create',t:'Create a React project with Vite',m:['local'],man:true,
+  what:'This creates a React starter. When asked, choose React and then JavaScript. Then move into the folder, install packages and start the preview server.',
+  blocks:[C('Create the project','npm create vite@latest sak-website'),C('Go into the folder','cd sak-website'),C('Install packages','npm install'),C('Start the development server','npm run dev')],
+  link:['https://vite.dev/guide/','Official Vite guide'],expect:'The terminal prints http://localhost:5173. Open it to see the React starter page.',
+  fail:[['Port already in use','Stop the other server with Ctrl+C, or run: npm run dev -- --port 5174']]},
+ promptStep('web'),
+ {id:'review',t:'Review and test your website',m:['local','ai','browser'],man:true,kind:'test',
+  what:'Test on desktop and a phone-sized window. Tick each item only after you checked it.',
+  checks:['Layout works on desktop and on a phone-sized screen','Every link opens the right place','Contact form or contact link really works (no fake forms)','You can use the whole site with only the keyboard (Tab key)','Text is readable and colors have enough contrast','Images load and have alt text','No red errors in the browser console (F12)','No invented testimonials, customers or statistics'],
+  blocks:[],expect:'Every box is ticked. If a form cannot send messages yet, the site clearly says so.',fail:[]},
+ {id:'improve',t:'Improve it with the AI',m:['local','ai','browser'],man:false,kind:'iterate',
+  what:'Make one improvement at a time, then test again.',blocks:IT(IT_WEB),expect:'Each change is small and testable.',fail:[]},
+ {id:'build',t:'Build for production',m:['local'],man:true,
+  what:'This creates the final small version of your site in the dist folder. Try it locally before publishing.',
+  blocks:[C('Create the production build','npm run build'),C('Try the built version','npm run preview')],expect:'A dist folder appears and the preview shows your site.',fail:[['The build fails','Copy the first error and use the debugging prompt in Troubleshooting.']]},
+ {id:'publish',t:'Publish and share your URL',m:['local','ai','browser'],man:true,kind:'publish',
+  what:'Use GitHub Pages: 1) Create a GitHub repository named sak-website and push your project. 2) Set base in vite.config.js to the repository name. 3) In Settings, then Pages, set Source to GitHub Actions. 4) Add the workflow. 5) Push to main. Pages serves your site over HTTPS automatically. A custom domain is optional: buy one from a registrar, then add it in Settings, then Pages, and follow the DNS instructions in the GitHub Pages documentation. AI website builders usually have their own publish button.',
+  blocks:[CODE('vite.config.js',viteBase('sak-website')),CODE('.github/workflows/deploy.yml (condensed from the official Vite guide)',WORKFLOW_YML)],
+  link:['https://vite.dev/guide/static-deploy.html','Official Vite static deployment guide'],
+  expect:'Your site opens at your public address on both phone and desktop. Share the URL.',
+  fail:[['Blank page after deploying','The base path does not match the repository name. Fix and push again.'],['Custom domain not working','DNS changes can take time. Check the GitHub Pages documentation and wait before retrying.']]}
+];
+LESSONS.app=[
+ aiPick('app'),browserStep('app'),
+ {id:'prereq',t:'Prepare your tools',m:['local','ai'],man:true,
+  what:'You need Node.js LTS, an editor such as VS Code, a terminal, the Expo Go app on your phone, and internet access. Install Expo Go from expo.dev/go or your phone\'s app store. Running an app in Expo Go is a development preview. It is not a finished app published to a store.',
+  blocks:[C('Check Node.js','node --version')],link:['https://expo.dev/go','Get Expo Go'],expect:'node --version prints a number and Expo Go is on your phone.',
+  fail:[['"node" is not recognized','Install Node.js LTS from nodejs.org, then open a new terminal.']]},
+ {id:'create',t:'Create the Expo project',m:['local','ai'],man:true,
+  what:'create-expo-app makes a starter app. Answer any prompts with the defaults. Then move into the folder and start the development server, which shows a QR code.',
+  blocks:[C('Create the project','npx create-expo-app@latest sak-app'),C('Go into the folder','cd sak-app'),C('Start the development server','npx expo start')],
+  link:['https://docs.expo.dev/get-started/create-a-project/','Official: create an Expo project'],
+  expect:'The terminal shows a QR code and options such as pressing a for Android.',fail:[['Command fails to run','Check Node.js is installed and your internet works. See Troubleshooting.']]},
+ {id:'phone',t:'Open the app on your phone',m:['local','ai'],man:true,
+  what:'Scan the QR code with Expo Go on Android, or with the camera app on iPhone, then tap the link. Your phone and computer should be on the same network. If it cannot connect, try the tunnel option, which is slower, so use it only as a fallback. For a physical iPhone, Expo CLI and Expo Go may need the same Expo account (run npx expo login).',
+  blocks:[C('Fallback if the normal connection fails','npx expo start --tunnel')],
+  link:['https://docs.expo.dev/get-started/start-developing/','Official: start developing'],
+  expect:'The starter app appears on your phone.',fail:[['QR code does not connect','Use the same Wi-Fi on both devices, turn off VPNs, or use the tunnel command.']]},
+ promptStep('app'),
+ {id:'test',t:'Test on your phone',m:['local','ai','browser'],man:true,kind:'test',
+  what:'Test on the real device. Tick an item only when you saw it work.',
+  checks:['You can add a task with a title','Empty title shows a helpful message','You can mark a task complete and undo it','You can delete a task','Total, pending and completed counts are correct','Empty state shows when there are no tasks','Buttons are easy to tap on a small screen','No red error screens appear'],
+  blocks:[],expect:'Every box is ticked. Note that tasks may disappear on reload until you add saving.',fail:[]},
+ {id:'improve',t:'Improve it with the AI',m:['local','ai','browser'],man:false,kind:'iterate',
+  what:'Make one improvement at a time, then test again on your phone.',blocks:IT(IT_APP),expect:'Each change is small and testable.',fail:[]},
+ {id:'release',t:'Understand the path to release',m:['local','ai','browser'],man:true,kind:'publish',
+  what:'A QR-code preview is not publishing. Release has separate stages: 1) Running in Expo Go, which is what you just did. 2) A development build, an app built for testing that can include your own native settings. 3) A production build, the file made for the stores. 4) Testing on real devices. 5) Preparing store information: description, screenshots, icon and a privacy disclosure. 6) Submitting to Google Play or the Apple App Store, each with its own account, rules and review. Stores may charge fees, so check their current requirements. This is a later lesson.',
+  blocks:[],link:['https://docs.expo.dev/get-started/start-developing/','Expo documentation'],
+  expect:'You can explain in your own words why Expo Go is different from a store release.',fail:[]}
+];
+
+/* ---------- state ---------- */
+var st={studio:'game',method:'local',os:(/Win/.test(navigator.platform||'')?'win':'mac'),diff:'Beginner',step:{game:0,web:0,app:0},warn:null};
+var saved=store('state');if(saved){st.studio=saved.studio||st.studio;st.method=saved.method||st.method;st.os=saved.os||st.os}
+function done(){return store('done')||{}}
+function isDone(s,id){var d=done();return !!(d[s+':'+id])}
+function setDone(s,id,v){var d=done();if(v)d[s+':'+id]=1;else delete d[s+':'+id];store('done',d)}
+function stepsFor(s){return LESSONS[s].filter(function(x){return x.m.indexOf(st.method)>=0})}
+function persist(){store('state',{studio:st.studio,method:st.method,os:st.os})}
+function setStudio(s){st.studio=s;st.warn=null;document.documentElement.setAttribute('data-studio',s);document.body.setAttribute('data-studio',s);persist();renderTut();renderChecklist()}
+
+/* ---------- home cards ---------- */
+function renderCards(){
+ $('#studiocards').innerHTML=ORDER.map(function(k){var s=STUDIOS[k];return '<article class="card sc" style="--c:'+s.c+'"><div class="sw"><i></i><i></i><i></i></div><h3>'+s.name+'</h3><p>'+s.tag+'</p><p class="muted" style="font-size:14px">Theme: '+s.who+'. Beginner project: '+s.beginner+'.</p><button class="btn sm" data-go="'+k+'">Open this studio</button></article>'}).join('');
+ $('#projcards').innerHTML=ORDER.map(function(k){var s=STUDIOS[k];return '<article class="card"><span class="chip on">'+s.projType+'</span><h3>'+s.proj+'</h3><p class="muted" style="font-size:14px">'+s.build+'</p><button class="btn sm ghost" data-go="'+k+'">Start this project</button></article>'}).join('');
+}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b){setStudio(b.getAttribute('data-go'));var el=$('#tutorial');el.scrollIntoView();}});
+
+/* ---------- setup checklist ---------- */
+var SETUP={game:['Open the Game studio and choose a build method','Local route: install Node.js LTS (node --version works)','Local route: install VS Code and open a terminal','Open a browser you can use for testing (press F12 to see the console)','Optional: create a free GitHub account for publishing'],
+ web:['Open the Web studio and choose a build method','Local route: install Node.js LTS (node --version works)','Local route: install VS Code and open a terminal','Write your project details: name, audience, purpose, main action','Create a free GitHub account for publishing'],
+ app:['Open the App studio','Install Node.js LTS (node --version works)','Install VS Code or another editor and open a terminal','Install Expo Go on your phone','Make sure your phone and computer use the same network']};
+function renderChecklist(){
+ var c=store('setup')||{},h='<div class="lbl">Checklist for '+STUDIOS[st.studio].name+'</div>';
+ h+=SETUP[st.studio].map(function(t,i){var id=st.studio+i;return '<label class="chk"><input type="checkbox" data-sc="'+id+'"'+(c[id]?' checked':'')+'><span>'+esc(t)+'</span></label>'}).join('');
+ var n=SETUP[st.studio].filter(function(t,i){return c[st.studio+i]}).length;
+ h+='<p class="muted" style="font-size:14px">'+n+' of '+SETUP[st.studio].length+' done · saved in this browser only</p>';
+ $('#setupcl').innerHTML=h;
+}
+document.addEventListener('change',function(e){var t=e.target;if(t.getAttribute&&t.getAttribute('data-sc')){var c=store('setup')||{};c[t.getAttribute('data-sc')]=t.checked?1:0;store('setup',c);renderChecklist()}});
+
+/* ---------- tutorial ---------- */
+function renderTabs(){
+ var tl=$('#studiotabs');tl.innerHTML=ORDER.map(function(k){return '<button class="tab" role="tab" id="tab-'+k+'" aria-selected="'+(k===st.studio)+'" aria-controls="tutbody" tabindex="'+(k===st.studio?0:-1)+'" data-tab="'+k+'">'+STUDIOS[k].name+'</button>'}).join('');
+ $('#tutbody').setAttribute('aria-labelledby','tab-'+st.studio);
+}
+$('#studiotabs').addEventListener('click',function(e){var b=e.target.closest('[data-tab]');if(b)setStudio(b.getAttribute('data-tab'))});
+tabKeys($('#studiotabs'),function(t){setStudio(t.getAttribute('data-tab'));var n=$('#tab-'+st.studio);if(n)n.focus()});
+
+function demoHTML(s){
+ if(s==='game')return '<iframe class="game" title="Catch the Coins live preview" sandbox="allow-scripts" srcdoc="'+esc(GAME_HTML)+'"></iframe><p class="muted" style="font-size:13px;text-align:center">Click the game, then play with arrow keys, A and D, or drag. This is the same code as the browser route.</p>';
+ if(s==='web')return '<div class="site" aria-label="Website preview"><div class="bar"><span>Your Name</span><span>Services</span><span>Work</span><span>Contact</span></div><div class="h"><b>Helping small businesses get online</b><span>Example layout only. Your real content goes here.</span><i>Get in touch</i></div><div class="s"><div>Service one</div><div>Service two</div><div>Service three</div></div></div><p class="muted" style="font-size:13px;text-align:center">Example layout of the site you will build. Content is a placeholder.</p>';
+ return '<div class="phone" id="appdemo"><h4>My Tasks</h4><div class="cnt"><span id="dt">Total 0</span><span id="dp">Pending 0</span><span id="dc">Done 0</span></div><form id="dform"><input type="text" id="dtext" placeholder="Add a task" aria-label="Task title"><button class="a" type="submit">Add</button></form><div class="err" id="derr" role="alert"></div><ul id="dlist"></ul></div><p class="muted" style="font-size:13px;text-align:center">Working preview of the finished idea. Tasks live in this page only.</p>';
+}
+function bindDemo(){
+ var f=$('#dform');if(!f)return;var tasks=[{t:'Read chapter 3',d:0},{t:'Finish maths homework',d:1}];
+ function draw(){var l=$('#dlist');l.innerHTML=tasks.length?tasks.map(function(k,i){return '<li class="'+(k.d?'dn':'')+'"><input type="checkbox" data-i="'+i+'" '+(k.d?'checked':'')+' aria-label="Complete '+esc(k.t)+'"><span>'+esc(k.t)+'</span><button type="button" data-x="'+i+'" aria-label="Delete '+esc(k.t)+'">Delete</button></li>'}).join(''):'<li><span>No tasks yet. Add your first one.</span></li>';
+  var d=tasks.filter(function(k){return k.d}).length;$('#dt').textContent='Total '+tasks.length;$('#dp').textContent='Pending '+(tasks.length-d);$('#dc').textContent='Done '+d}
+ f.addEventListener('submit',function(e){e.preventDefault();var v=$('#dtext').value.trim();if(!v){$('#derr').textContent='Please type a task title.';return}$('#derr').textContent='';tasks.push({t:v,d:0});$('#dtext').value='';draw()});
+ $('#dlist').addEventListener('click',function(e){var x=e.target.getAttribute('data-x');if(x!==null){tasks.splice(+x,1);draw()}});
+ $('#dlist').addEventListener('change',function(e){var i=e.target.getAttribute('data-i');if(i!==null){tasks[+i].d=e.target.checked?1:0;draw()}});
+ draw();
+}
+function seg(label,id,opts,cur,note){return '<div class="grp"><span class="lbl" id="'+id+'">'+label+'</span><div class="seg" role="group" aria-labelledby="'+id+'">'+opts.map(function(o){return '<button type="button" data-'+id+'="'+o[0]+'" aria-pressed="'+(o[0]===cur)+'">'+o[1]+'</button>'}).join('')+'</div>'+(note?'<span class="muted" style="font-size:13px">'+note+'</span>':'')+'</div>'}
+var METHOD_NOTE={ai:'AI workspace: fastest to see a result. Limits, features and free usage depend on the provider.',local:'Local development: most control and best for learning. Needs Node.js and a terminal.',browser:'Browser-only learning: nothing to install, but limited. Not available for every part.'};
+
+function renderTut(){
+ var s=st.studio,S=STUDIOS[s];renderTabs();$('#tuttitle').textContent=S.lesson;
+ var steps=stepsFor(s),n=steps.length,i=Math.min(st.step[s],n-1);st.step[s]=i;var x=steps[i];
+ var doneN=steps.filter(function(y){return isDone(s,y.id)}).length;
+ var h='<div class="two"><div class="card"><div class="lbl">What you will build</div><p>'+S.build+'</p><div class="lbl">What you need</div><ul class="plain">'+S.need.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul></div><div class="preview"><div class="lbl">Preview</div>'+demoHTML(s)+'</div></div>';
+ h+='<div class="sel" style="margin-top:14px">'+seg('Operating system','os',[['mac','macOS'],['win','Windows']],st.os,'Commands change to match.')
+  +seg('Build method','method',[['ai','AI workspace'],['local','Local'],['browser','Browser only']],st.method,METHOD_NOTE[st.method])
+  +seg('Difficulty','diff',[['Beginner','Beginner'],['Intermediate','Intermediate'],['Advanced','Advanced']],st.diff,st.diff==='Beginner'?'Complete beginner lessons.':'')+'</div>';
+ if(st.diff!=='Beginner')h+='<p class="note" style="margin-top:12px">'+st.diff+' lessons are in development and are not available yet. Showing the Beginner lesson.</p>';
+ h+='<div class="stepper" style="margin-top:14px"><div class="slider"><div class="row" style="justify-content:space-between"><span class="stepno">Step '+(i+1)+' of '+n+'</span><span class="stepno">'+doneN+' of '+n+' marked done</span></div><input type="range" id="slide" min="1" max="'+n+'" value="'+(i+1)+'" aria-label="Tutorial step"><div class="dots">'+steps.map(function(y,k){return '<i class="'+(isDone(s,y.id)?'d':'')+(k===i?' cur':'')+'"></i>'}).join('')+'</div></div>';
+ if(st.warn){var w=steps[st.warn.first];h+='<div class="warn" role="alert"><span>Step '+(st.warn.first+1)+' ("'+esc(w.t)+'") is not marked done. Skipping setup steps often causes errors later.</span><div class="row"><button class="btn sm" data-wgo="'+st.warn.first+'">Go to step '+(st.warn.first+1)+'</button><button class="btn sm ghost" data-wforce="'+st.warn.target+'">Continue anyway</button></div></div>'}
+ h+='<div><h3>'+esc(x.t)+'</h3></div><p>'+esc(x.what)+'</p>';
+ if(x.link)h+='<p><a href="'+x.link[0]+'" target="_blank" rel="noopener noreferrer">'+esc(x.link[1])+'</a></p>';
+ if(x.fields)h+='<div class="fields" id="wfields">'+[['name','Project name'],['aud','Target audience'],['purp','Main purpose'],['act','Main action visitors should take'],['col','Preferred colors'],['det','Content and services']].map(function(f){return '<label>'+f[1]+'<input type="text" data-wf="'+f[0]+'" placeholder="Enter '+f[1].toLowerCase()+'"></label>'}).join('')+'</div>';
+ x.blocks.forEach(function(b){
+  if(b.k==='cmd'){var t=st.os==='win'?b.win:b.mac;h+=box(b.label,t,b.wrap?'wrap':'')}
+  else h+=box(b.label,b.text,'wrap',b.id)});
+ if(x.checks)h+='<div class="card">'+x.checks.map(function(c,k){var id='t'+s+x.id+k;return '<label class="chk"><input type="checkbox" data-tc="'+id+'"'+((store('tc')||{})[id]?' checked':'')+'><span>'+esc(c)+'</span></label>'}).join('')+'</div>';
+ h+='<div class="expect"><b>Expected result.</b> '+esc(x.expect)+'</div>';
+ if(x.fail&&x.fail.length)h+='<details class="fail"><summary>If it fails</summary><div class="in">'+x.fail.map(function(f){return '<div><b>'+esc(f[0])+'</b><br><span class="muted">'+esc(f[1])+'</span></div>'}).join('')+'<a href="#help">Open the Troubleshooting center</a></div></details>';
+ h+='<label class="done"><input type="checkbox" id="mark"'+(isDone(s,x.id)?' checked':'')+'> I did this step and it worked</label>';
+ h+='<div class="nav"><button class="btn ghost" data-nav="-1"'+(i===0?' disabled':'')+'>Previous</button><button class="btn" data-nav="1"'+(i===n-1?' disabled':'')+'>Next step</button></div>';
+ h+='<div class="outline" aria-label="All steps">'+steps.map(function(y,k){return '<button data-jump="'+k+'" class="'+(isDone(s,y.id)?'d ':'')+(k===i?'cur':'')+'" title="'+esc(y.t)+'">'+(k+1)+'</button>'}).join('')+'</div></div>';
+ var all=doneN===n;
+ h+='<div class="card" style="margin-top:14px"><div class="lbl">Save your progress</div><p class="muted" style="font-size:14px">Progress is saved in this browser only. Copy a summary to keep your own record.</p><div class="row"><button class="btn sm ghost" id="sumbtn">Copy progress summary</button></div>'+box('',summary(),'wrap','sumtxt').replace('class="cmdbox"','class="cmdbox" hidden')+'</div>';
+ h+='<div class="card" style="margin-top:14px"><div class="lbl">Completion check</div><p>'+(all?'All steps are marked done. Share your published link, then take the next lesson: <b>'+S.next+'</b> (planned).':'Finish every step to complete this lesson. Goal: '+S.out+'.')+'</p></div>';
+ $('#tutbody').innerHTML=h;bindDemo();bindWebFields();
+}
+function summary(){var s=st.studio,steps=stepsFor(s);return 'SAK Studio progress\n'+STUDIOS[s].lesson+' ('+st.method+' route)\n'+steps.map(function(y,k){return (isDone(s,y.id)?'[x] ':'[ ] ')+(k+1)+'. '+y.t}).join('\n')}
+function bindWebFields(){
+ var f=$('#wfields');if(!f)return;var p=$('#mainprompt');
+ f.addEventListener('input',function(){var t=P_WEB,m={name:'[ENTER NAME]',aud:'[ENTER AUDIENCE]',purp:'[ENTER PURPOSE]',act:'[ENTER ACTION]',col:'[ENTER COLORS]',det:'[ENTER DETAILS]'};$$('[data-wf]',f).forEach(function(i){var v=i.value.trim();if(v)t=t.split(m[i.getAttribute('data-wf')]).join(v)});p.textContent=t});
+}
+function goto(i,force){
+ var s=st.studio,steps=stepsFor(s);i=Math.max(0,Math.min(steps.length-1,i));
+ if(!force&&i>st.step[s]){var first=-1;for(var k=0;k<i;k++){if(steps[k].man&&!isDone(s,steps[k].id)){first=k;break}}
+  if(first>=0){st.warn={first:first,target:i};renderTut();return}}
+ st.warn=null;st.step[s]=i;renderTut();
+}
+$('#tutbody').addEventListener('click',function(e){
+ var t=e.target;
+ var b=t.closest('[data-os]');if(b){st.os=b.getAttribute('data-os');persist();renderTut();return}
+ b=t.closest('[data-method]');if(b){st.method=b.getAttribute('data-method');st.step[st.studio]=0;st.warn=null;persist();renderTut();return}
+ b=t.closest('[data-diff]');if(b){st.diff=b.getAttribute('data-diff');renderTut();return}
+ b=t.closest('[data-nav]');if(b){goto(st.step[st.studio]+(+b.getAttribute('data-nav')));return}
+ b=t.closest('[data-jump]');if(b){goto(+b.getAttribute('data-jump'));return}
+ b=t.closest('[data-wgo]');if(b){goto(+b.getAttribute('data-wgo'),true);return}
+ b=t.closest('[data-wforce]');if(b){goto(+b.getAttribute('data-wforce'),true);return}
+ if(t.id==='sumbtn'){var box=$('#sumtxt');box.parentNode.parentNode.hidden=false;var btn=$('.cpy',box.parentNode);copyFrom(btn)}
+});
+$('#tutbody').addEventListener('change',function(e){
+ var t=e.target;
+ if(t.id==='slide'){goto(+t.value-1);return}
+ if(t.id==='mark'){var s=st.studio,x=stepsFor(s)[st.step[s]];setDone(s,x.id,t.checked);renderTut();return}
+ if(t.getAttribute('data-tc')){var c=store('tc')||{};c[t.getAttribute('data-tc')]=t.checked?1:0;store('tc',c)}
+});
+
+/* ---------- videos ---------- */
+var VIDS=[['start','Getting Started',[['https://vite.dev/guide/','Vite getting started'],['https://react.dev/learn','React Learn']]],
+ ['game','Game Development',[['https://vite.dev/guide/','Vite getting started']]],
+ ['web','Web Development',[['https://react.dev/learn','React Learn'],['https://vite.dev/guide/','Vite getting started']]],
+ ['app','App Development',[['https://docs.expo.dev/get-started/create-a-project/','Create an Expo project'],['https://docs.expo.dev/get-started/start-developing/','Start developing with Expo'],['https://expo.dev/go','Get Expo Go']]],
+ ['debug','Debugging',[['#help','SAK Studio troubleshooting center']]],
+ ['pub','Publishing Projects',[['https://vite.dev/guide/static-deploy.html','Vite static deployment guide'],['https://docs.github.com/en/pages','GitHub Pages documentation']]]];
+var vcur='start';
+function renderVid(){
+ $('#vidtabs').innerHTML=VIDS.map(function(v){return '<button class="tab" role="tab" aria-selected="'+(v[0]===vcur)+'" tabindex="'+(v[0]===vcur?0:-1)+'" data-v="'+v[0]+'">'+v[1]+'</button>'}).join('');
+ var v=VIDS.filter(function(x){return x[0]===vcur})[0];
+ $('#vidbody').innerHTML='<div class="vid"><div class="ph">Video coming soon<br>'+v[1]+'</div><div><div class="lbl">Read the official documentation meanwhile</div><ul class="plain">'+v[2].map(function(l){return '<li><a href="'+l[0]+'"'+(l[0].charAt(0)==='#'?'':' target="_blank" rel="noopener noreferrer"')+'>'+esc(l[1])+'</a></li>'}).join('')+'</ul></div></div>';
+}
+$('#vidtabs').addEventListener('click',function(e){var b=e.target.closest('[data-v]');if(b){vcur=b.getAttribute('data-v');renderVid()}});
+tabKeys($('#vidtabs'),function(t){vcur=t.getAttribute('data-v');renderVid();var n=$('[data-v="'+vcur+'"]');if(n)n.focus()});
+
+/* ---------- library ---------- */
+var LIB=[];
+function addLib(studio,type,list){list.forEach(function(t,i){LIB.push({studio:studio,type:type,title:t[0],diff:t[1],dur:t[2],ready:i===0})})}
+addLib('game','Game',[['Your First Browser Game','Beginner',60],['Player Movement and Controls','Beginner',30],['Collision Detection and Scoring','Beginner',45],['Levels and Difficulty','Intermediate',45],['Sound and Game Feedback','Intermediate',30],['Debugging with AI','Beginner',30],['Mobile-Friendly Gameplay','Intermediate',45],['Testing and Publishing','Beginner',45]]);
+addLib('web','Website',[['Your First Website','Beginner',45],['AI Prompt Anatomy for Websites','Beginner',30],['Layouts and Responsive Design','Beginner',45],['Navigation and Components','Intermediate',45],['Forms and User Input','Intermediate',45],['APIs and Data','Advanced',60],['Testing and Accessibility','Intermediate',45],['SEO and Performance','Intermediate',45],['Hosting and Custom Domains','Intermediate',45],['Portfolio and Client Handover','Advanced',90]]);
+addLib('app','Mobile app',[['Create Your First Expo Project','Beginner',45],['Run It on Your Phone','Beginner',30],['Build Your First Screen','Beginner',45],['Add State and User Input','Beginner',45],['Navigate Between Screens','Intermediate',45],['Save Data Locally','Intermediate',45],['Debug and Test','Intermediate',45],['Design for Different Screen Sizes','Intermediate',45],['Prepare a Production Build','Advanced',90],['Understand App Store Release','Advanced',60]]);
+function renderLib(){
+ var q=$('#fq').value.toLowerCase(),fs=$('#fs').value,fd=$('#fd').value,ft=$('#ft').value,fp=$('#fp').value;
+ var r=LIB.filter(function(l){if(q&&(l.title+' '+STUDIOS[l.studio].name).toLowerCase().indexOf(q)<0)return false;if(fs&&l.studio!==fs)return false;if(fd&&l.diff!==fd)return false;if(fp&&l.type!==fp)return false;
+  if(ft==='30'&&l.dur>30)return false;if(ft==='60'&&l.dur>60)return false;if(ft==='999'&&l.dur<=60)return false;return true});
+ $('#liblist').innerHTML=r.length?r.map(function(l){return '<div class="li"><div class="t"><b>'+esc(l.title)+'</b><div class="row" style="gap:6px"><span class="chip">'+STUDIOS[l.studio].name+'</span><span class="chip">'+l.diff+'</span><span class="chip">~'+l.dur+' min (est.)</span><span class="chip">'+l.type+'</span></div></div>'+(l.ready?'<button class="btn sm" data-go="'+l.studio+'">Open lesson</button>':'<span class="chip soon">Planned</span>')+'</div>'}).join(''):'<div class="empty">No tutorials match. Clear a filter.</div>';
+}
+['fq','fs','fd','ft','fp'].forEach(function(id){document.getElementById(id).addEventListener('input',renderLib)});
+
+/* ---------- troubleshooting ---------- */
+var TR=[
+ {q:'Node.js is not installed',m:'Your computer cannot find Node.js, the program that runs project tools.',c:'Never installed, or the terminal was open during install.',d:'node --version',mac:'Download LTS from nodejs.org, or run: brew install node. Open a NEW terminal afterwards.',win:'Download LTS from nodejs.org, or run: winget install OpenJS.NodeJS.LTS. Open a NEW terminal afterwards.',p:'I am a beginner. Node.js does not seem to be installed on my [Windows/Mac] computer. Walk me through installing Node.js LTS and checking it with node --version, one step at a time.'},
+ {q:'npm or npx is not recognized',m:'The terminal cannot find the npm or npx command.',c:'Node.js not installed, install not finished, or the terminal was not restarted.',d:'node --version, then npm --version',mac:'Restart Terminal. If it still fails, reinstall Node.js.',win:'Close PowerShell and open a new one. If it fails, reinstall Node.js and restart the computer.',p:'My terminal says npm is not recognized. I use [Windows/Mac]. Help me find out why with safe checks, and explain each step in simple words.'},
+ {q:'Dependencies fail to install',m:'npm install could not download or set up packages.',c:'No internet, an old Node.js version, or a broken download.',d:'node --version (Vite needs 20.19+ or 22.12+). Read the FIRST red error line.',mac:'Update Node.js, check your network and run npm install again.',win:'Update Node.js, check your network and run npm install again. Try PowerShell as normal user, not admin.',p:'npm install fails with this error: [PASTE FIRST ERROR LINES, NO SECRETS]. Explain what it means and give the safest fix first.'},
+ {q:'Port already in use',m:'Another program is already using the address the dev server wants (such as 5173).',c:'An earlier dev server is still running in another terminal.',d:'Look for another terminal running the project.',mac:'Stop it with Ctrl+C, or use another port: npm run dev -- --port 5174. To see what uses the port: lsof -i :5173',win:'Stop it with Ctrl+C, or use another port: npm run dev -- --port 5174. To see what uses the port: netstat -ano | findstr :5173',p:'My dev server says the port is already in use. Explain how to find what uses it and how to start on another port without breaking anything.'},
+ {q:'Development server does not start',m:'npm run dev stops with an error instead of showing a local address.',c:'You are not in the project folder, packages not installed, or a code error.',d:'Check you are in the right folder (the one that has package.json), then read the first error.',mac:'cd into the project folder, run npm install, then npm run dev.',win:'cd into the project folder, run npm install, then npm run dev.',p:'npm run dev fails with: [PASTE ERROR]. My folder contains: [LIST FILES]. Explain the cause and the smallest fix.'},
+ {q:'The AI changed the wrong files',m:'The AI edited files you did not expect.',c:'The request was too wide, or the AI did not inspect the project first.',d:'Ask the AI: which files did you change and why? If you use Git: git status and git diff show changes safely.',mac:'Ask the AI to undo the specific change. If you use Git you can review with git diff before accepting anything.',win:'Same on Windows. Ask the AI to undo the specific change and review with git diff if you use Git.',p:'You changed files I did not ask about. List every file you changed and why. Then revert the unrelated changes and redo only this task: [DESCRIBE TASK]. Inspect first and keep changes minimal.'},
+ {q:'Missing packages',m:'The code imports something that is not installed.',c:'The AI used a package but did not install it.',d:'Read the error. It names the missing package.',mac:'npm install PACKAGE_NAME (use the name from the error).',win:'npm install PACKAGE_NAME (use the name from the error).',p:'My project says it cannot find package [NAME]. Explain whether I really need it, or whether the code should be changed instead. Avoid adding unnecessary dependencies.'},
+ {q:'Blank browser screen',m:'The page loads but shows nothing.',c:'A JavaScript error stopped the page, or you opened the wrong address.',d:'Press F12, open Console, and read the first red error.',mac:'Press Cmd+Option+J (Chrome) to open the console.',win:'Press F12 or Ctrl+Shift+J to open the console.',p:'My page is blank. The browser console says: [PASTE FIRST RED ERROR]. Find the likely cause in my code and fix it with the smallest change.'},
+ {q:'JavaScript console errors',m:'Red messages in the browser console mean something in the code failed.',c:'A typo, undefined value, missing file or failed request.',d:'Read the first error. Note the file name and line number.',mac:'Cmd+Option+J in Chrome.',win:'F12 in the browser.',p:'The console shows this error: [PASTE ERROR]. Explain it in simple words, point to the line, fix it and tell me how to confirm it is fixed.'},
+ {q:'Vite deployment shows a blank page',m:'Your published site is blank although it works locally.',c:'The base path does not match your repository name, so files are not found.',d:'Open the console on the live site. Look for 404 errors on assets.',mac:'Set base to "/YOUR-REPO/" in vite.config.js, build and push again.',win:'Set base to "/YOUR-REPO/" in vite.config.js, build and push again.',p:'My Vite site works locally but is blank on GitHub Pages at https://USER.github.io/REPO/. Check my vite.config.js base setting and workflow, and explain the fix.'},
+ {q:'Expo QR code does not connect',m:'Scanning the code does not open your app.',c:'Different networks, a VPN, a firewall, or a public network.',d:'Check phone and computer are on the same Wi-Fi.',mac:'Restart with: npx expo start --tunnel (slower, use as fallback).',win:'Restart with: npx expo start --tunnel (slower, use as fallback).',p:'My Expo QR code does not connect from my phone. I use [Android/iPhone] and [Windows/Mac]. Give me a ranked checklist of safe things to try.'},
+ {q:'Phone and computer cannot communicate',m:'The phone cannot reach the computer\'s development server.',c:'Router isolates devices, guest Wi-Fi, firewall, or VPN.',d:'Turn off VPNs and try a home network or a phone hotspot.',mac:'Allow Node through the macOS firewall if asked. Then try the tunnel.',win:'Allow Node.js through Windows Defender Firewall on private networks if asked. Then try the tunnel.',p:'My phone cannot connect to my computer for Expo development. Explain likely network causes and guide me through safe checks.'},
+ {q:'App crashes on launch',m:'The app opens then closes, or shows a red error screen.',c:'A code error, a missing package, or a version mismatch with Expo Go.',d:'Read the red error text on the phone and in the terminal.',mac:'Stop the server (Ctrl+C), run npx expo start again.',win:'Stop the server (Ctrl+C), run npx expo start again.',p:'My Expo app crashes at launch with this message: [PASTE ERROR, NO SECRETS]. Explain what it means and fix it with the smallest change.'},
+ {q:'Git or deployment errors',m:'Git or the publishing workflow reported a failure.',c:'Not signed in to GitHub, wrong branch name, or a failing build step.',d:'git status shows the state safely. Open the Actions tab on GitHub and read the failing step.',mac:'Run git status, then read the error. Do not use force commands you do not understand.',win:'Run git status, then read the error. Do not use force commands you do not understand.',p:'My Git or GitHub Actions step failed with: [PASTE ERROR WITHOUT TOKENS]. Explain the cause and give safe steps. Do not suggest force-push unless you explain the risk.'},
+ {q:'A button or form does not work',m:'Clicking does nothing, or a form seems to send but nothing arrives.',c:'No code is attached to the button, an error occurred, or no backend or form service exists.',d:'Open the console, click the button and watch for errors.',mac:'Test again after any fix and in a private window.',win:'Test again after any fix and in a private window.',p:'This button or form does not work: [DESCRIBE]. Check whether it is really connected to working code or a form service. Do not fake success messages.'}
+];
+function renderTr(){
+ var q=$('#tq').value.toLowerCase();
+ var r=TR.filter(function(t){return !q||(t.q+' '+t.m+' '+t.c).toLowerCase().indexOf(q)>=0});
+ $('#trlist').innerHTML=r.length?r.map(function(t,i){var pid='tp'+i+(++uid);
+  return '<details class="q"><summary>'+esc(t.q)+'</summary><div class="in"><div><b>What it means.</b> '+esc(t.m)+'</div><div><b>Likely causes.</b> '+esc(t.c)+'</div><div><b>Safe check.</b> '+esc(t.d)+'</div><div><b>Fix on macOS.</b> '+esc(t.mac)+'</div><div><b>Fix on Windows.</b> '+esc(t.win)+'</div>'+box('AI debugging prompt',t.p,'wrap',pid)+'</div></details>'}).join(''):'<div class="empty">No matches. Try another word.</div>';
+}
+$('#tq').addEventListener('input',renderTr);
+$('#gloss').innerHTML=GLOSS.map(function(g){return '<details class="gl"><summary>'+g[0]+'</summary><div class="in">'+esc(g[1])+'</div></details>'}).join('');
+
+/* ---------- init ---------- */
+document.documentElement.setAttribute('data-studio',st.studio);document.body.setAttribute('data-studio',st.studio);
+renderCards();renderChecklist();renderTut();renderVid();renderLib();renderTr();
+</script>
+
+</body></html>
